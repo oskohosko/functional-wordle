@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 // This is for our bootstrap, css and js
 app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "src")))
 app.use("/bootstrap/css", express.static(path.join(__dirname, "node_modules/bootstrap/dist/css")))
 app.use("/bootstrap/js", express.static(path.join(__dirname, "node_modules/bootstrap/dist/js")))
 
