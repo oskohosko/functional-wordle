@@ -66,8 +66,25 @@ const checkGuess = (state, guess) => {
     //! TODO
 }
 
+// Function that checks if the key pressed is valid and allowed.
+const isValidKey = (state, keyName) => {
+    const keyCode = keyName.toUpperCase().charCodeAt(0)
+    // Boolean value checking if key pressed is alphabetic
+    const isAlpha = (keyCode >= 65 && keyCode <= 90 && keyName.length == 1)
+    // Now need to check if there's room in current guess
+    const isRoom = state.currentGuess.length < 5
+
+    return isRoom && isAlpha
+}
+
 // Removing last character from current guess
 const decreaseGuess = (state) => {
+    // Getting the cube Id to remove letter from
+    const cubeId = state.guesses.length + state.currentGuess.length - 1
+    const cube = document.getElementById(`cube-${cubeId}`)
+    // Removing innerHTML
+    cube.innerHTML = ""
+    // Returning state, with the last letter of currentGuess removed
     return {
         ...state,
         currentGuess: state.currentGuess.slice(0, -1)
@@ -83,9 +100,11 @@ document.addEventListener('keydown', (event) => {
         // Updating current game state
         currentState = decreaseGuess(currentState)
     // Ensuring a valid alphabetic key was pressed
-    } else if (keyCode >= 65 && keyCode <= 90) {
+    } else if (isValidKey(currentState, keyName)) {
+        console.log(keyName)
         console.log(keyCode)
         // Need to place the letters in their div elements
         currentState = addLetter(currentState, keyName)
+
     }
 })
