@@ -7,7 +7,6 @@ const gameState = {
     word: 'oskar',
     guesses: [],
     currentGuess: '',
-    maxGuesses: 6,
     gameOver: false
 }
 
@@ -45,11 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
 const addLetter = (state, letter) => {
     // Current row is representative by the number of guesses user has made
     const currRow = state.guesses.length
+    console.log(currRow)
     // And current column is representative by the current guess
     const currCol = state.currentGuess.length
+    console.log(currCol)
     // This is the cube we need to place the letter in
-    const cubeId = currRow + currCol
+    const cubeId = (currRow * 5) + currCol
     const cube = document.getElementById(`cube-${cubeId}`)
+    console.log(cubeId)
     // Updating HTML.
     //! Check later for functional
     cube.innerHTML = letter.toUpperCase()
@@ -63,7 +65,7 @@ const addLetter = (state, letter) => {
 
 // Function that checks if the letter is correct or in the word
 const checkLetter = (letter, index) => {
-    console.log(letter, index)
+    // console.log(letter, index)
     // Firstly check if letter is correct
     if (currentState.word[index] === letter) {
         return "green"
@@ -78,13 +80,21 @@ const checkLetter = (letter, index) => {
 
 // Function to update the state and check the guesses.
 const checkGuess = (state) => {
-    // Logic of checking each letter
-    const guessArr = state.currentGuess.split('')
-    console.log(guessArr)
-
+    // Creating a list from the guess
+    const guess = state.currentGuess
+    const guessArr = guess.split('')
+    // Mapping each letter in the guess to the wordle colour
     const results = guessArr.map(checkLetter)
     console.log(results)
+    const updatedGuesses = [...state.guesses, guess]
+    //! Update HTML
 
+    return {
+        ...state,
+        currentGuess: '',
+        guesses: updatedGuesses,
+        gameOver: updatedGuesses.length === 6 ? true : false
+    }
 }
 
 // Function that checks if the key pressed is valid and allowed.
@@ -118,22 +128,28 @@ const decreaseGuess = (state) => {
 document.addEventListener('keydown', (event) => {
     const keyName = event.key
     const keyCode = keyName.toUpperCase().charCodeAt(0)
-    // Checking if delete key was pressed
-    if (keyName === 'Backspace' || keyName === 'Delete') {
-        // Updating current game state
-        currentState = decreaseGuess(currentState)
-    // Ensuring a valid alphabetic key was pressed
-    } else if (isValidKey(currentState, keyName)) {
-        console.log(keyName)
-        console.log(keyCode)
-        // Need to place the letters in their div elements
-        currentState = addLetter(currentState, keyName)
-    // And now checking if enter was pressed
-    } else if (keyName === 'Enter') {
-        // Check if currentGuess is 5 long
-        if (currentState.currentGuess.length > 4) {
-            // Add it to guesses and check the guess
-            checkGuess(currentState)
+    if (!currentState.gameOver) {
+        // Checking if delete key was pressed
+        if (keyName === 'Backspace' || keyName === 'Delete') {
+            // Updating current game state
+            currentState = decreaseGuess(currentState)
+        // Ensuring a valid alphabetic key was pressed
+        } else if (isValidKey(currentState, keyName)) {
+            // console.log(keyName)
+            // console.log(keyCode)
+            // Need to place the letters in their div elements
+            currentState = addLetter(currentState, keyName)
+        // And now checking if enter was pressed
+        } else if (keyName === 'Enter') {
+            // Check if currentGuess is 5 long
+            if (currentState.currentGuess.length > 4) {
+                // Add it to guesses and check the guess
+                currentState = checkGuess(currentState)
+                console.log(currentState)
+            }
         }
+    } else {
+        //! RESET GAME
     }
+
 })
