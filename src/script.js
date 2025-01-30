@@ -68,13 +68,13 @@ const checkLetter = (letter, index) => {
     // console.log(letter, index)
     // Firstly check if letter is correct
     if (currentState.word[index] === letter) {
-        return "green"
+        return 'green'
     // Then if it is in the word but not correct position
     } else if (currentState.word.includes(letter)) {
-        return "yellow"
+        return 'yellow'
     // Otherwise, not in word
     } else {
-        return "grey"
+        return 'grey'
     }
 }
 
@@ -89,11 +89,20 @@ const checkGuess = (state) => {
     const updatedGuesses = [...state.guesses, guess]
     //! Update HTML
 
+    // Checking if we have won
+    // Reducing to a boolean
+    const win = results.reduce((prev, curr) => {
+        const isGreen = curr === 'green'
+        return prev && isGreen
+    }, true)
+
+    console.log(win)
+
     return {
         ...state,
         currentGuess: '',
         guesses: updatedGuesses,
-        gameOver: updatedGuesses.length === 6 ? true : false
+        gameOver: (updatedGuesses.length === 6) || win ? true : false
     }
 }
 
@@ -111,10 +120,10 @@ const isValidKey = (state, keyName) => {
 // Removing last character from current guess
 const decreaseGuess = (state) => {
     // Getting the cube Id to remove letter from
-    const cubeId = state.guesses.length + state.currentGuess.length - 1
+    const cubeId = (state.guesses.length * 5) + state.currentGuess.length - 1
     const cube = document.getElementById(`cube-${cubeId}`)
     // Removing letter
-    if (cubeId >= 0) {
+    if (cubeId >= state.guesses.length * 5) {
         cube.innerHTML = ''
     }
     // Returning state, with the last letter of currentGuess removed
@@ -145,7 +154,6 @@ document.addEventListener('keydown', (event) => {
             if (currentState.currentGuess.length > 4) {
                 // Add it to guesses and check the guess
                 currentState = checkGuess(currentState)
-                console.log(currentState)
             }
         }
     } else {
