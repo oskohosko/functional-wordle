@@ -90,14 +90,12 @@ const checkGuess = (state) => {
     //! Update HTML
 
     // Checking if we have won
-    // Reducing to a boolean
+    // Reducing to a boolean - if all green true else false
     const win = results.reduce((prev, curr) => {
-        const isGreen = curr === 'green'
-        return prev && isGreen
+        return prev && (curr === 'green')
     }, true)
 
-    console.log(win)
-
+    // Updating guesses and checking if the game is over
     return {
         ...state,
         currentGuess: '',
@@ -136,16 +134,17 @@ const decreaseGuess = (state) => {
 // Testing out key events
 document.addEventListener('keydown', (event) => {
     const keyName = event.key
-    const keyCode = keyName.toUpperCase().charCodeAt(0)
     if (!currentState.gameOver) {
+        // Handling ctrl, alt and meta
+        if (event.ctrlKey || event.altKey || event.metaKey) {
+            return
+        }
         // Checking if delete key was pressed
         if (keyName === 'Backspace' || keyName === 'Delete') {
             // Updating current game state
             currentState = decreaseGuess(currentState)
         // Ensuring a valid alphabetic key was pressed
         } else if (isValidKey(currentState, keyName)) {
-            // console.log(keyName)
-            // console.log(keyCode)
             // Need to place the letters in their div elements
             currentState = addLetter(currentState, keyName)
         // And now checking if enter was pressed
