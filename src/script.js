@@ -6,7 +6,7 @@
 const gameState = {
     word: 'oskar',
     guesses: [],
-    currentGuess: "",
+    currentGuess: '',
     maxGuesses: 6,
     gameOver: false
 }
@@ -61,9 +61,30 @@ const addLetter = (state, letter) => {
     }
 }
 
+// Function that checks if the letter is correct or in the word
+const checkLetter = (letter, index) => {
+    console.log(letter, index)
+    // Firstly check if letter is correct
+    if (currentState.word[index] === letter) {
+        return "green"
+    // Then if it is in the word but not correct position
+    } else if (currentState.word.includes(letter)) {
+        return "yellow"
+    // Otherwise, not in word
+    } else {
+        return "grey"
+    }
+}
+
 // Function to update the state and check the guesses.
-const checkGuess = (state, guess) => {
-    //! TODO
+const checkGuess = (state) => {
+    // Logic of checking each letter
+    const guessArr = state.currentGuess.split('')
+    console.log(guessArr)
+
+    const results = guessArr.map(checkLetter)
+    console.log(results)
+
 }
 
 // Function that checks if the key pressed is valid and allowed.
@@ -82,8 +103,10 @@ const decreaseGuess = (state) => {
     // Getting the cube Id to remove letter from
     const cubeId = state.guesses.length + state.currentGuess.length - 1
     const cube = document.getElementById(`cube-${cubeId}`)
-    // Removing innerHTML
-    cube.innerHTML = ""
+    // Removing letter
+    if (cubeId >= 0) {
+        cube.innerHTML = ''
+    }
     // Returning state, with the last letter of currentGuess removed
     return {
         ...state,
@@ -96,7 +119,7 @@ document.addEventListener('keydown', (event) => {
     const keyName = event.key
     const keyCode = keyName.toUpperCase().charCodeAt(0)
     // Checking if delete key was pressed
-    if ((keyName === "Backspace" || keyName === "Delete")) {
+    if (keyName === 'Backspace' || keyName === 'Delete') {
         // Updating current game state
         currentState = decreaseGuess(currentState)
     // Ensuring a valid alphabetic key was pressed
@@ -105,6 +128,12 @@ document.addEventListener('keydown', (event) => {
         console.log(keyCode)
         // Need to place the letters in their div elements
         currentState = addLetter(currentState, keyName)
-
+    // And now checking if enter was pressed
+    } else if (keyName === 'Enter') {
+        // Check if currentGuess is 5 long
+        if (currentState.currentGuess.length > 4) {
+            // Add it to guesses and check the guess
+            checkGuess(currentState)
+        }
     }
 })
