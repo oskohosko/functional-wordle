@@ -42,6 +42,7 @@ app.get('/', (req, res) => {
 // For getting our random word
 const getRandomWord = () => {
     const filePath = path.join(__dirname, 'words.txt')
+    // Splitting txt file to list of words then finding random one.
     const data = fs.readFileSync(filePath, 'utf8')
     const wordsArr = data.split('\n')
     const index = Math.floor(Math.random() * wordsArr.length)
@@ -49,6 +50,7 @@ const getRandomWord = () => {
     return wordsArr[index]
 }
 
+// API Endpoint to send to our script.js
 app.get('/random-word', (req, res) => {
     const randomWord = getRandomWord()
     res.json({ word: randomWord })

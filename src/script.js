@@ -27,6 +27,16 @@ const setupGrid = () => {
         wordGrid.appendChild(cube)
     })
 }
+// Setting up the grid
+setupGrid()
+
+const resetLetters = () => {
+    const cubes = document.querySelectorAll('.grid .cube')
+    cubes.forEach(cube => {
+        cube.innerHTML = ''
+        cube.style.background = 'transparent'
+    })
+}
 
 const getRandomWord = async () => {
     try {
@@ -38,20 +48,21 @@ const getRandomWord = async () => {
         console.error(err)
         return null
     }
+
 }
 
 // Function to setup the game
 const setupGame = async () => {
-    // Setting up the grid
-    setupGrid()
     const randomWord = await getRandomWord()
     // As this is planning to be functional, I need a game state to be passed around
     const gameState = {
-        word: randomWord,
+        word: 'oskar',
         guesses: [],
         currentGuess: '',
         gameOver: false
     }
+
+    resetLetters()
 
     return gameState
 }
@@ -81,19 +92,53 @@ const addLetter = (state, letter) => {
     }
 }
 
+// Function that counts the occurences of each letter in target word
+const countOccs = () => {
+    // Checks if letter exists if not equal 0 else add 1
+    return currentState.word.split('').reduce((occs, char) => {
+        occs[char] = (occs[char] || 0) + 1
+        return occs
+    }, {})
+}
+
 // Function that checks if the letter is correct or in the word
-const checkLetter = (letter, index) => {
-    // console.log(letter, index)
-    // Firstly check if letter is correct
-    if (currentState.word[index] === letter) {
-        return 'green'
-    // Then if it is in the word but not correct position
-    } else if (currentState.word.includes(letter)) {
-        return 'yellow'
-    // Otherwise, not in word
-    } else {
-        return 'grey'
-    }
+const checkLetters = (guess) => {
+    // Getting frequencies of each letter
+    let freqs = countOccs()
+    // Firstly need to check if any letters are in correct positions
+    // These take priority
+    const initialCheck = guess.split('').map((char, i) => {
+        // If it's correct, we decrease frequency
+        if (char === currentState.word[i]) {
+            // Making a copy of freqs (not mutating)
+            freqs = {
+                ...freqs,
+                [char]: freqs[char] - 1
+            }
+            return 'green';
+        }
+        return 'grey';
+    });
+
+    // Now need to check if the letters are present in the word
+    return guess.split('').map((char, i) => {
+        // Making sure we keep greens same
+        if (initialCheck[i] === 'green') {
+            return 'green';
+        }
+        // Now checking if there can be any yellows
+        // Ensuring the letter isn't already taken
+        if (freqs[char] > 0) {
+            // If character is present in frequencies, decrease and yellow
+            freqs = {
+                ...freqs,
+                [char]: freqs[char] - 1
+            }
+            return 'yellow';
+        }
+        // Else grey
+        return 'grey';
+    });
 }
 
 // Function to update the state and check the guesses.
@@ -101,12 +146,20 @@ const checkGuess = (state) => {
     // Creating a list from the guess
     const guess = state.currentGuess
     const guessArr = guess.split('')
-    // Mapping each letter in the guess to the wordle colour
-    const results = guessArr.map(checkLetter)
-    console.log(results)
     const updatedGuesses = [...state.guesses, guess]
+    // Mapping each letter in the guess to the wordle colour
+    const results = checkLetters(guess)
     //! Update HTML
+    results.forEach((colour, index) => {
+        const row = updatedGuesses.length - 1
+        const col = index
 
+        const cubeId = (row * 5) + col
+        const cube = document.getElementById(`cube-${cubeId}`)
+        cube.style.background = colour
+    })
+
+    // const cubeId = (state.guesses.length * 5) + state.currentGuess.length - 1
     // Checking if we have won
     // Reducing to a boolean - if all green true else false
     const win = results.reduce((prev, curr) => {
@@ -150,7 +203,7 @@ const decreaseGuess = (state) => {
 }
 
 // Testing out key events
-document.addEventListener('keydown', (event) => {
+document.addEventListener('keydown', async (event) => {
     const keyName = event.key
     if (!currentState.gameOver) {
         // Handling ctrl, alt and meta
@@ -175,7 +228,8 @@ document.addEventListener('keydown', (event) => {
         }
     } else {
         //! Reset game
-        currentState = setupGame()
+        currentState = await setupGame()
+
     }
 })
 
