@@ -34,7 +34,7 @@ const resetLetters = () => {
     const cubes = document.querySelectorAll('.grid .cube')
     cubes.forEach(cube => {
         cube.innerHTML = ''
-        cube.style.background = 'transparent'
+        cube.removeAttribute('style')
     })
 }
 
@@ -56,7 +56,7 @@ const setupGame = async () => {
     const randomWord = await getRandomWord()
     // As this is planning to be functional, I need a game state to be passed around
     const gameState = {
-        word: 'oskar',
+        word: randomWord,
         guesses: [],
         currentGuess: '',
         gameOver: false
@@ -83,7 +83,7 @@ const addLetter = (state, letter) => {
     console.log(cubeId)
     // Updating HTML.
     //! Check later for functional
-    cube.innerHTML = letter.toUpperCase()
+    cube.innerHTML = `<h1>${letter.toUpperCase()}<h1>`
 
     return {
         ...state,
@@ -156,7 +156,8 @@ const checkGuess = (state) => {
 
         const cubeId = (row * 5) + col
         const cube = document.getElementById(`cube-${cubeId}`)
-        cube.style.background = colour
+        cube.style.background = `light${colour}`
+        cube.style.border = `light${colour}`
     })
 
     // const cubeId = (state.guesses.length * 5) + state.currentGuess.length - 1
@@ -228,6 +229,7 @@ document.addEventListener('keydown', async (event) => {
         }
     } else {
         //! Reset game
+        console.log(currentState.word)
         currentState = await setupGame()
 
     }

@@ -15,11 +15,12 @@ body {
 .cube {
     width: 60px;
     height: 60px;
-    border: 3px solid black;
+    border: 3px solid lightgray;
     border-radius: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* margin-bottom: 0; */
     /*
     Disabling highlighting and user selection
     */
@@ -29,4 +30,8 @@ body {
    -webkit-user-select: none;
    -ms-user-select: none;
    user-select: none;
+}
+
+h1 {
+    margin-bottom: 0;
 }
