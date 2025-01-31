@@ -2,19 +2,7 @@
  * Main file containing code for my game for now.
  */
 
-// As this is planning to be functional, I need a game state to be passed around
-const gameState = {
-    word: 'oskar',
-    guesses: [],
-    currentGuess: '',
-    gameOver: false
-}
-
-// The state we are replacing
-let currentState = gameState
-
-// Setting up the grid
-document.addEventListener('DOMContentLoaded', () => {
+const setupGrid = () => {
     // Grabbing our grid
     const wordGrid = document.getElementById('word-grid')
 
@@ -38,7 +26,37 @@ document.addEventListener('DOMContentLoaded', () => {
         cube.id = `cube-${index}`
         wordGrid.appendChild(cube)
     })
-})
+}
+
+const getRandomWord = async () => {
+    try {
+        // Getting the random word
+        const response = await fetch('random-word')
+        const data = await response.json()
+        return data.word
+    } catch (err) {
+        console.error(err)
+        return null
+    }
+}
+
+// Function to setup the game
+const setupGame = async () => {
+    // Setting up the grid
+    setupGrid()
+    const randomWord = await getRandomWord()
+    // As this is planning to be functional, I need a game state to be passed around
+    const gameState = {
+        word: randomWord,
+        guesses: [],
+        currentGuess: '',
+        gameOver: false
+    }
+
+    return gameState
+}
+
+let currentState = await setupGame()
 
 // Function to add a letter to the current cube
 const addLetter = (state, letter) => {
@@ -156,7 +174,11 @@ document.addEventListener('keydown', (event) => {
             }
         }
     } else {
-        //! RESET GAME
+        //! Reset game
+        currentState = setupGame()
     }
-
 })
+
+
+
+
