@@ -4,6 +4,12 @@ body {
     align-items: center;
 }
 
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(5, 60px);
@@ -32,6 +38,54 @@ body {
    user-select: none;
 }
 
-h1 {
+h2 {
     margin-bottom: 0;
+}
+
+/* Keyboard stuff */
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(1, 60px);
+    grid-template-rows: repeat(3, 60px) 60px;
+    gap: 2px;
+    margin-top: 10vh;
+}
+
+.keyboard-row {
+    display: grid;
+    grid-template-columns: repeat(11, 60px);
+    gap: 2px;
+    margin-top: 2vh;
+    justify-content: center;
+}
+
+.second-row {
+    grid-template-columns: repeat(10, 60px);;
+}
+
+.third-row {
+    grid-template-columns: repeat(7, 60px);;
+}
+
+.key {
+    width: 60px;
+    height: 60px;
+    border: 3px solid lightgray;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+.special-key {
+    background-color: #dbdbdb;
+}
+
+.key:hover {
+    background-color: #e0e0e0;
 }

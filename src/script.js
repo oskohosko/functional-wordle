@@ -83,7 +83,7 @@ const addLetter = (state, letter) => {
     console.log(cubeId)
     // Updating HTML.
     //! Check later for functional
-    cube.innerHTML = `<h1>${letter.toUpperCase()}<h1>`
+    cube.innerHTML = `<h2>${letter.toUpperCase()}<h2>`
 
     return {
         ...state,
@@ -172,7 +172,7 @@ const checkGuess = (state) => {
         ...state,
         currentGuess: '',
         guesses: updatedGuesses,
-        gameOver: (updatedGuesses.length === 6) || win ? true : false
+        gameOver: (win || updatedGuesses.length === 6) ? true : false
     }
 }
 
@@ -228,9 +228,12 @@ document.addEventListener('keydown', async (event) => {
             }
         }
     } else {
-        //! Reset game
-        console.log(currentState.word)
-        currentState = await setupGame()
+        if (keyName === 'Enter') {
+            //! Reset game
+            console.log(currentState.word)
+            currentState = await setupGame()
+        }
+        
 
     }
 })
