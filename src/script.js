@@ -60,9 +60,9 @@ const resetLetters = () => {
         cube.removeAttribute('style')
     })
     // And doing the same for our keys in keyboard
-    // document.querySelectorAll('.key').forEach((key) => {
-    //     key.removeAttribute('style')
-    // })
+    document.querySelectorAll('.key').forEach((key) => {
+        key.removeAttribute('style')
+    })
 }
 
 // Updates the letters in grid and on keyboard based on colours of guess
@@ -109,13 +109,16 @@ const setupGame = async () => {
     const randomWord = await getRandomWord()
     // As this is planning to be functional, I need a game state to be passed around
     const gameState = {
-        word: 'oskar',
+        word: randomWord,
         guesses: [],
         currentGuess: '',
         gameOver: false
     }
-
+    // Changing colours of all the letters
     resetLetters()
+
+    // and resetting the word above the grid
+    document.getElementById('final-word').innerHTML = ''
 
     return gameState
 }
@@ -270,6 +273,11 @@ document.addEventListener('keydown', async (event) => {
             if (currentState.currentGuess.length > 4) {
                 // Add it to guesses and check the guess
                 currentState = checkGuess(currentState)
+                // Checking if it's game over
+                if (currentState.gameOver) {
+                    // Displaying the final word
+                    document.getElementById('final-word').innerHTML = `<h1>${currentState.word}<h1>`
+                }
             }
         }
         console.log(currentState)
@@ -284,5 +292,8 @@ document.addEventListener('keydown', async (event) => {
 })
 
 
-
+// Listening if reset icon was pressed
+document.getElementById('reset-icon').addEventListener('click', async () => {
+    currentState = await setupGame()
+})
 
