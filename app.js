@@ -36,7 +36,7 @@ app.listen(PORT_NUM, () => {
 
 // Home page
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Home' })
+    res.render('index', { title: 'Oskle' })
 })
 
 // For getting our random word

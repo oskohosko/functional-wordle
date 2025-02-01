@@ -30,12 +30,65 @@ const setupGrid = () => {
 // Setting up the grid
 setupGrid()
 
+// Code to simulate a keydown event from clicking on our virtual keyboard
+const simulateKeydown = (key) => {
+    const event = new KeyboardEvent('keydown', {
+        key: key,
+        code: key === 'Enter' ? 'Enter' : `Key${key.toUpperCase()}`,
+        keyCode: key,
+        which: key,
+        bubbles: true
+    })
+    console.log('CLICK', event)
+    document.dispatchEvent(event)
+}
+
+// And adding this function to each of our keys
+document.querySelectorAll('.key').forEach((element) => {
+    element.addEventListener('click', () => {
+        // Checking if enter or delete were pressed
+        const keyName = element.textContent
+        const key = (keyName === 'Enter' || keyName === 'Delete') ? keyName : keyName.toLowerCase()
+        simulateKeydown(key)
+    })
+})
+
 const resetLetters = () => {
-    const cubes = document.querySelectorAll('.grid .cube')
-    cubes.forEach(cube => {
+    // Firstly selecting all of our cubes in our grid
+    document.querySelectorAll('.grid .cube').forEach(cube => {
         cube.innerHTML = ''
         cube.removeAttribute('style')
     })
+    // And doing the same for our keys in keyboard
+    // document.querySelectorAll('.key').forEach((key) => {
+    //     key.removeAttribute('style')
+    // })
+}
+
+// Updates the letters in grid and on keyboard based on colours of guess
+const updateLetters = (colours) => {
+    // Updating letters on each row
+    colours.forEach((colour, index) => {
+        const row = currentState.guesses.length
+        const col = index
+
+        const cubeId = (row * 5) + col
+        const cube = document.getElementById(`cube-${cubeId}`)
+        cube.style.background = `light${colour}`
+        cube.style.border = `light${colour}`
+
+        // And doing the same for our keys in keyboard
+        document.querySelectorAll('.key').forEach((key) => {
+            console.log(key)
+            // Ensuring letter is the same as the one in the guess
+            if (key.textContent.toLowerCase() === currentState.currentGuess[index]) {
+                console.log(`Updating ${key.textContent}`)
+                key.style.background = `light${colour}`
+                key.style.border = `light${colour}`
+            }
+        })
+    })
+
 }
 
 const getRandomWord = async () => {
@@ -56,7 +109,7 @@ const setupGame = async () => {
     const randomWord = await getRandomWord()
     // As this is planning to be functional, I need a game state to be passed around
     const gameState = {
-        word: randomWord,
+        word: 'oskar',
         guesses: [],
         currentGuess: '',
         gameOver: false
@@ -73,14 +126,11 @@ let currentState = await setupGame()
 const addLetter = (state, letter) => {
     // Current row is representative by the number of guesses user has made
     const currRow = state.guesses.length
-    console.log(currRow)
     // And current column is representative by the current guess
     const currCol = state.currentGuess.length
-    console.log(currCol)
     // This is the cube we need to place the letter in
     const cubeId = (currRow * 5) + currCol
     const cube = document.getElementById(`cube-${cubeId}`)
-    console.log(cubeId)
     // Updating HTML.
     //! Check later for functional
     cube.innerHTML = `<h2>${letter.toUpperCase()}<h2>`
@@ -102,6 +152,7 @@ const countOccs = () => {
 }
 
 // Function that checks if the letter is correct or in the word
+// Returns an array of colours
 const checkLetters = (guess) => {
     // Getting frequencies of each letter
     let freqs = countOccs()
@@ -150,15 +201,7 @@ const checkGuess = (state) => {
     // Mapping each letter in the guess to the wordle colour
     const results = checkLetters(guess)
     //! Update HTML
-    results.forEach((colour, index) => {
-        const row = updatedGuesses.length - 1
-        const col = index
-
-        const cubeId = (row * 5) + col
-        const cube = document.getElementById(`cube-${cubeId}`)
-        cube.style.background = `light${colour}`
-        cube.style.border = `light${colour}`
-    })
+    updateLetters(results)
 
     // const cubeId = (state.guesses.length * 5) + state.currentGuess.length - 1
     // Checking if we have won
@@ -206,6 +249,8 @@ const decreaseGuess = (state) => {
 // Testing out key events
 document.addEventListener('keydown', async (event) => {
     const keyName = event.key
+    console.log(keyName)
+    console.log('PRESS', event)
     if (!currentState.gameOver) {
         // Handling ctrl, alt and meta
         if (event.ctrlKey || event.altKey || event.metaKey) {
@@ -227,13 +272,13 @@ document.addEventListener('keydown', async (event) => {
                 currentState = checkGuess(currentState)
             }
         }
+        console.log(currentState)
     } else {
         if (keyName === 'Enter') {
             //! Reset game
             console.log(currentState.word)
             currentState = await setupGame()
         }
-        
 
     }
 })
